@@ -270,7 +270,7 @@ def main():
     """, unsafe_allow_html=True)
     
     st.markdown('<h1 class="main-header">🏠 Bengaluru House Price Predictor</h1>', unsafe_allow_html=True)
-    st.markdown('<p class="sub-header">Interactive ML-powered AI tool</p>', unsafe_allow_html=True)
+    st.markdown('<p class="sub-header">Interactive ML-powered tool for 3rd Year Computer Science Students</p>', unsafe_allow_html=True)
     
     # Load data and model
     df = load_data()
@@ -445,40 +445,90 @@ def display_prediction_results(prediction, location, sqft, bath, bhk, df):
     </div>
     """, unsafe_allow_html=True)
     
-    # Additional metrics
+    # Enhanced visibility for key metrics
+    st.markdown("---")
+    st.subheader("🔍 **Detailed Analysis**")
+    
+    # Price per square foot with enhanced styling
     col1, col2 = st.columns(2)
     
     with col1:
-        st.metric(
-            "Price per Sq Ft",
-            f"₹{prediction['price_per_sqft']:.0f}",
-            help="Price per square foot"
-        )
+        st.markdown(f"""
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                    color: white; padding: 20px; border-radius: 15px; margin: 10px 0;
+                    text-align: center; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);">
+            <h3 style="margin: 0; font-size: 1.2em;">💰 Price per Sq Ft</h3>
+            <h1 style="margin: 10px 0; font-size: 2.5em; font-weight: bold;">₹{prediction['price_per_sqft']:.0f}</h1>
+            <p style="margin: 0; opacity: 0.9; font-size: 0.9em;">Calculated price per square foot</p>
+        </div>
+        """, unsafe_allow_html=True)
     
     with col2:
         affordability_index = calculate_affordability_index(prediction['price'])
-        st.metric(
-            "Affordability Index",
-            f"{affordability_index}/10",
-            help="Affordability rating based on average income"
-        )
+        # Color coding for affordability
+        if affordability_index >= 8:
+            color = "#28a745"  # Green
+            status = "Highly Affordable"
+        elif affordability_index >= 6:
+            color = "#ffc107"  # Yellow
+            status = "Moderately Affordable"
+        elif affordability_index >= 4:
+            color = "#fd7e14"  # Orange
+            status = "Less Affordable"
+        else:
+            color = "#dc3545"  # Red
+            status = "Expensive"
+            
+        st.markdown(f"""
+        <div style="background: linear-gradient(135deg, {color} 0%, {color}aa 100%); 
+                    color: white; padding: 20px; border-radius: 15px; margin: 10px 0;
+                    text-align: center; box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);">
+            <h3 style="margin: 0; font-size: 1.2em;">📊 Affordability Index</h3>
+            <h1 style="margin: 10px 0; font-size: 2.5em; font-weight: bold;">{affordability_index}/10</h1>
+            <p style="margin: 0; opacity: 0.9; font-size: 0.9em;">{status}</p>
+        </div>
+        """, unsafe_allow_html=True)
     
-    # Market comparison
+    # Market comparison with enhanced visibility
     location_data = df[df['location'] == location]
     if not location_data.empty:
         avg_price = location_data['price'].mean()
         comparison = ((prediction['price'] - avg_price) / avg_price) * 100
         
+        st.markdown("### 📈 **Market Comparison**")
+        
         if comparison > 0:
             st.markdown(f"""
-            <div class="warning-box">
-                <strong>Market Comparison:</strong> This property is {comparison:.1f}% above average for {location}
+            <div style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%); 
+                        color: white; padding: 25px; border-radius: 15px; margin: 15px 0;
+                        border-left: 5px solid #ff4757; box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);">
+                <h3 style="margin: 0 0 10px 0; display: flex; align-items: center;">
+                    <span style="font-size: 1.5em; margin-right: 10px;">⚠️</span>
+                    Above Market Average
+                </h3>
+                <p style="margin: 0; font-size: 1.1em; font-weight: 500;">
+                    This property is <strong>{comparison:.1f}% above average</strong> for {location}
+                </p>
+                <p style="margin: 10px 0 0 0; opacity: 0.9; font-size: 0.9em;">
+                    Average price in {location}: ₹{avg_price:.2f} lakhs
+                </p>
             </div>
             """, unsafe_allow_html=True)
         else:
             st.markdown(f"""
-            <div class="insight-box">
-                <strong>Market Comparison:</strong> This property is {abs(comparison):.1f}% below average for {location}
+            <div style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); 
+                        color: white; padding: 25px; border-radius: 15px; margin: 15px 0;
+                        border-left: 5px solid #28a745; box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);">
+                <h3 style="margin: 0 0 10px 0; display: flex; align-items: center;">
+                    <span style="font-size: 1.5em; margin-right: 10px;">✅</span>
+                    Below Market Average
+                </h3>
+                <p style="margin: 0; font-size: 1.1em; font-weight: 500;">
+                    This property is <strong>{abs(comparison):.1f}% below average</strong> for {location}
+                </p>
+                <p style="margin: 10px 0 0 0; opacity: 0.9; font-size: 0.9em;">
+                    Average price in {location}: ₹{avg_price:.2f} lakhs
+                </p>
             </div>
             """, unsafe_allow_html=True)
     
